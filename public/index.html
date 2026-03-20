@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatFlow - Conecte-se em tempo real</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="login-screen" class="screen">
+        <div class="login-container animate__animated animate__fadeIn">
+            <div class="login-header">
+                <div class="logo">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <h1>ChatFlow</h1>
+                <p>Conecte-se com amigos em tempo real</p>
+            </div>
+            
+            <div class="login-form">
+                <div class="avatar-selector">
+                    <div class="avatar-preview" id="avatarPreview">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <label for="avatarInput" class="avatar-label">
+                        <i class="fas fa-camera"></i>
+                        <span>Escolher foto</span>
+                    </label>
+                    <input type="file" id="avatarInput" accept="image/*" style="display: none">
+                </div>
+                
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="username" placeholder="Nome de usuário" maxlength="30">
+                </div>
+                
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="pin" placeholder="PIN de 6 dígitos" maxlength="6" pattern="\d*">
+                </div>
+                
+                <button id="loginBtn" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Entrar no Chat</span>
+                </button>
+                
+                <div id="loginError" class="error-message"></div>
+            </div>
+            
+            <div class="login-footer">
+                <p>Use um PIN de 6 dígitos para entrar</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="chat-screen" class="screen" style="display: none;">
+        <div class="chat-container">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <div class="user-profile">
+                        <div class="user-avatar">
+                            <img id="currentUserImage" src="" alt="Perfil">
+                            <span class="online-indicator"></span>
+                        </div>
+                        <div class="user-info">
+                            <span id="currentUsername" class="user-name"></span>
+                            <span class="user-status">Online</span>
+                        </div>
+                        <button id="logoutBtn" class="logout-btn">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Seção de Solicitações de Amizade -->
+                <div class="friend-requests-section">
+                    <button class="friend-requests-btn" onclick="toggleFriendRequests()">
+                        <div class="btn-content">
+                            <i class="fas fa-user-friends"></i>
+                            <span>Solicitações</span>
+                        </div>
+                        <span id="friendRequestsBadge" class="badge" style="display: none;">0</span>
+                    </button>
+                    <div id="friendRequestsList" class="friend-requests-list" style="display: none;"></div>
+                </div>
+                
+                <!-- Abas -->
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="users">
+                        <i class="fas fa-users"></i>
+                        <span>Usuários</span>
+                    </button>
+                    <button class="tab-btn" data-tab="chats">
+                        <i class="fas fa-comment"></i>
+                        <span>Conversas</span>
+                    </button>
+                </div>
+                
+                <!-- Busca -->
+                <div class="search-container">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchUsers" placeholder="Buscar usuários...">
+                    </div>
+                </div>
+                
+                <!-- Conteúdo das Abas -->
+                <div class="tab-content active" id="users-tab">
+                    <div class="users-list" id="usersList"></div>
+                </div>
+                
+                <div class="tab-content" id="chats-tab">
+                    <div class="chats-list" id="chatsList">
+                        <div class="empty-state">
+                            <i class="fas fa-comment-slash"></i>
+                            <p>Nenhuma conversa ainda</p>
+                            <span>Adicione amigos para começar</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sidebar-footer">
+                    <div class="online-counter">
+                        <i class="fas fa-circle"></i>
+                        <span id="onlineCount">0 online</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Área do chat -->
+            <div class="chat-area">
+                <!-- Chat Geral -->
+                <div id="general-chat" class="chat-window active">
+                    <div class="chat-header">
+                        <div class="chat-info">
+                            <div class="chat-avatar">
+                                <i class="fas fa-globe"></i>
+                            </div>
+                            <div class="chat-details">
+                                <h3>Chat Geral</h3>
+                                <span class="chat-status">Conversa pública</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="messages-container" id="generalMessages">
+                        <div class="welcome-message">
+                            <i class="fas fa-hand-wave"></i>
+                            <h4>Bem-vindo ao Chat Geral!</h4>
+                            <p>Comece a conversar com todos os usuários</p>
+                        </div>
+                    </div>
+                    
+                    <div class="message-input-container">
+                        <button id="attachImageBtn" class="attach-btn">
+                            <i class="fas fa-image"></i>
+                        </button>
+                        <input type="file" id="imageInput" accept="image/*" style="display: none">
+                        <div class="input-wrapper">
+                            <input type="text" id="generalMessageInput" placeholder="Digite uma mensagem...">
+                            <button id="sendGeneralBtn" class="send-btn">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Chats Privados -->
+                <div id="private-chats-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Templates -->
+    <template id="messageTemplate">
+        <div class="message">
+            <img class="message-avatar" src="" alt="">
+            <div class="message-content">
+                <div class="message-header">
+                    <span class="message-author"></span>
+                    <span class="message-time"></span>
+                </div>
+                <div class="message-body"></div>
+            </div>
+        </div>
+    </template>
+
+    <template id="privateChatTemplate">
+        <div class="chat-window" id="chat-">
+            <div class="chat-header">
+                <button class="back-to-general">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="chat-info">
+                    <div class="chat-avatar">
+                        <img class="chat-user-image" src="" alt="">
+                    </div>
+                    <div class="chat-details">
+                        <h3 class="chat-user-name"></h3>
+                        <span class="chat-user-status"></span>
+                    </div>
+                </div>
+                <div class="chat-actions">
+                    <span class="typing-indicator"></span>
+                </div>
+            </div>
+            
+            <div class="messages-container private-messages"></div>
+            
+            <div class="message-input-container">
+                <button class="attach-private-btn attach-btn">
+                    <i class="fas fa-image"></i>
+                </button>
+                <input type="file" class="private-image-input" accept="image/*" style="display: none">
+                <div class="input-wrapper">
+                    <input type="text" class="private-message-input" placeholder="Digite uma mensagem...">
+                    <button class="send-private-btn send-btn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        function toggleFriendRequests() {
+            const list = document.getElementById('friendRequestsList');
+            if (list.style.display === 'none') {
+                list.style.display = 'block';
+            } else {
+                list.style.display = 'none';
+            }
+        }
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
